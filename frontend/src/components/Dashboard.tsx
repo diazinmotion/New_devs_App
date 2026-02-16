@@ -1,16 +1,29 @@
 import React, { useState } from "react";
 import { RevenueSummary } from "./RevenueSummary";
+import { useAuth } from "../contexts/AuthContext.new";
 
+// we can't rebuild the system, so i assume based on the code, i cant add any new endpoints
+// so i will hardcode the properties
+
+// this is taken from the database
 const PROPERTIES = [
-  { id: 'prop-001', name: 'Beach House Alpha' },
-  { id: 'prop-002', name: 'City Apartment Downtown' },
-  { id: 'prop-003', name: 'Country Villa Estate' },
-  { id: 'prop-004', name: 'Lakeside Cottage' },
-  { id: 'prop-005', name: 'Urban Loft Modern' }
+  { id: 'prop-001', tenant_id: 'tenant-a', name: 'Beach House Alpha' },
+  { id: 'prop-003', tenant_id: 'tenant-a', name: 'Country Villa Estate' },
+  { id: 'prop-002', tenant_id: 'tenant-a', name: 'City Apartment Downtown' },
+  { id: 'prop-001', tenant_id: 'tenant-b', name: 'Mountain Lodge Beta' },
+  { id: 'prop-004', tenant_id: 'tenant-b', name: 'Lakeside Cottage' },
+  { id: 'prop-005', tenant_id: 'tenant-b', name: 'Urban Loft Modern' },
 ];
 
 const Dashboard: React.FC = () => {
   const [selectedProperty, setSelectedProperty] = useState('prop-001');
+
+  // get the current tenant_id
+  const { user } = useAuth();
+  const tenant_id = user?.tenant_id;
+
+  // filter properties based on tenant id
+  const filteredProperties = PROPERTIES.filter((property) => property.tenant_id === tenant_id);
 
   return (
     <div className="p-4 lg:p-6 min-h-full">
@@ -23,7 +36,7 @@ const Dashboard: React.FC = () => {
               <div>
                 <h2 className="text-lg lg:text-xl font-medium text-gray-900 mb-2">Revenue Overview</h2>
                 <p className="text-sm lg:text-base text-gray-600">
-                  Monthly performance insights for your properties
+                  Monthly performance insights for your properties {tenant_id}
                 </p>
               </div>
               
@@ -34,8 +47,8 @@ const Dashboard: React.FC = () => {
                   value={selectedProperty}
                   onChange={(e) => setSelectedProperty(e.target.value)}
                   className="block w-full sm:w-auto min-w-[200px] px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm"
-                >
-                  {PROPERTIES.map((property) => (
+                >                  
+                  {filteredProperties.map((property) => (
                     <option key={property.id} value={property.id}>
                       {property.name}
                     </option>
